@@ -11,7 +11,7 @@ resource "azurerm_spring_cloud_app" "spring_cloud_apps" {
   tls_enabled             = each.value.tls_enabled
 
   dynamic "custom_persistent_disk" {
-    for_each = each.value.custom_persistent_disk != null ? [each.value.custom_persistent_disk] : []
+    for_each = each.value.custom_persistent_disk != null ? each.value.custom_persistent_disk : []
     content {
       mount_options     = custom_persistent_disk.value.mount_options
       mount_path        = custom_persistent_disk.value.mount_path

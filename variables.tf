@@ -36,32 +36,40 @@ EOT
     resource_group_name     = string
     service_name            = string
     addon_json              = optional(string)
-    https_only              = optional(bool, false)
-    is_public               = optional(bool, false)
+    https_only              = optional(bool) # Default: false
+    is_public               = optional(bool) # Default: false
     public_endpoint_enabled = optional(bool)
-    tls_enabled             = optional(bool, false)
-    custom_persistent_disk = optional(object({
+    tls_enabled             = optional(bool) # Default: false
+    custom_persistent_disk = optional(list(object({
       mount_options     = optional(set(string))
       mount_path        = string
-      read_only_enabled = optional(bool, false)
+      read_only_enabled = optional(bool) # Default: false
       share_name        = string
       storage_name      = string
-    }))
+    })))
     identity = optional(object({
       identity_ids = optional(set(string))
       type         = string
     }))
     ingress_settings = optional(object({
-      backend_protocol        = optional(string, "Default")
-      read_timeout_in_seconds = optional(number, 300)
-      send_timeout_in_seconds = optional(number, 60)
-      session_affinity        = optional(string, "None")
+      backend_protocol        = optional(string) # Default: "Default"
+      read_timeout_in_seconds = optional(number) # Default: 300
+      send_timeout_in_seconds = optional(number) # Default: 60
+      session_affinity        = optional(string) # Default: "None"
       session_cookie_max_age  = optional(number)
     }))
     persistent_disk = optional(object({
-      mount_path = optional(string, "/persistent")
+      mount_path = optional(string) # Default: "/persistent"
       size_in_gb = number
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.spring_cloud_apps : (
+        v.custom_persistent_disk == null || (length(v.custom_persistent_disk) >= 1)
+      )
+    ])
+    error_message = "Each custom_persistent_disk list must contain at least 1 items"
+  }
 }
 
