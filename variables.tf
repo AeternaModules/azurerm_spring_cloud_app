@@ -36,14 +36,14 @@ EOT
     resource_group_name     = string
     service_name            = string
     addon_json              = optional(string)
-    https_only              = optional(bool) # Default: false
-    is_public               = optional(bool) # Default: false
+    https_only              = optional(bool)
+    is_public               = optional(bool)
     public_endpoint_enabled = optional(bool)
-    tls_enabled             = optional(bool) # Default: false
+    tls_enabled             = optional(bool)
     custom_persistent_disk = optional(list(object({
       mount_options     = optional(set(string))
       mount_path        = string
-      read_only_enabled = optional(bool) # Default: false
+      read_only_enabled = optional(bool)
       share_name        = string
       storage_name      = string
     })))
@@ -52,57 +52,17 @@ EOT
       type         = string
     }))
     ingress_settings = optional(object({
-      backend_protocol        = optional(string) # Default: "Default"
-      read_timeout_in_seconds = optional(number) # Default: 300
-      send_timeout_in_seconds = optional(number) # Default: 60
-      session_affinity        = optional(string) # Default: "None"
+      backend_protocol        = optional(string)
+      read_timeout_in_seconds = optional(number)
+      send_timeout_in_seconds = optional(number)
+      session_affinity        = optional(string)
       session_cookie_max_age  = optional(number)
     }))
     persistent_disk = optional(object({
-      mount_path = optional(string) # Default: "/persistent"
+      mount_path = optional(string)
       size_in_gb = number
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.spring_cloud_apps : (
-        v.custom_persistent_disk == null || (length(v.custom_persistent_disk) >= 1)
-      )
-    ])
-    error_message = "Each custom_persistent_disk list must contain at least 1 items"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.spring_cloud_apps : (
-        v.ingress_settings == null || (v.ingress_settings.read_timeout_in_seconds == null || (v.ingress_settings.read_timeout_in_seconds >= 0))
-      )
-    ])
-    error_message = "must be at least 0"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.spring_cloud_apps : (
-        v.ingress_settings == null || (v.ingress_settings.send_timeout_in_seconds == null || (v.ingress_settings.send_timeout_in_seconds >= 0))
-      )
-    ])
-    error_message = "must be at least 0"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.spring_cloud_apps : (
-        v.ingress_settings == null || (v.ingress_settings.session_cookie_max_age == null || (v.ingress_settings.session_cookie_max_age >= 0))
-      )
-    ])
-    error_message = "must be at least 0"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.spring_cloud_apps : (
-        v.persistent_disk == null || (v.persistent_disk.size_in_gb >= 0 && v.persistent_disk.size_in_gb <= 50)
-      )
-    ])
-    error_message = "must be between 0 and 50"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_spring_cloud_app's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -151,8 +111,20 @@ EOT
   #   message:   must not be empty
   # path: ingress_settings.backend_protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ingress_settings.read_timeout_in_seconds
+  #   condition: value >= 0
+  #   message:   must be at least 0
+  # path: ingress_settings.send_timeout_in_seconds
+  #   condition: value >= 0
+  #   message:   must be at least 0
   # path: ingress_settings.session_affinity
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ingress_settings.session_cookie_max_age
+  #   condition: value >= 0
+  #   message:   must be at least 0
+  # path: persistent_disk.size_in_gb
+  #   condition: value >= 0 && value <= 50
+  #   message:   must be between 0 and 50
   # path: persistent_disk.mount_path
   #   source:    [from validate.MountPath] !ok
   # path: persistent_disk.mount_path
