@@ -20,11 +20,11 @@ output "spring_cloud_apps_https_only" {
 }
 output "spring_cloud_apps_identity" {
   description = "Map of identity values across all spring_cloud_apps, keyed the same as var.spring_cloud_apps"
-  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => v.identity if v.identity != null && length(v.identity) > 0 }
+  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => one(v.identity) if v.identity != null && length(v.identity) > 0 }
 }
 output "spring_cloud_apps_ingress_settings" {
   description = "Map of ingress_settings values across all spring_cloud_apps, keyed the same as var.spring_cloud_apps"
-  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => v.ingress_settings if v.ingress_settings != null && length(v.ingress_settings) > 0 }
+  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => one(v.ingress_settings) if v.ingress_settings != null && length(v.ingress_settings) > 0 }
 }
 output "spring_cloud_apps_is_public" {
   description = "Map of is_public values across all spring_cloud_apps, keyed the same as var.spring_cloud_apps"
@@ -36,7 +36,7 @@ output "spring_cloud_apps_name" {
 }
 output "spring_cloud_apps_persistent_disk" {
   description = "Map of persistent_disk values across all spring_cloud_apps, keyed the same as var.spring_cloud_apps"
-  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => v.persistent_disk if v.persistent_disk != null && length(v.persistent_disk) > 0 }
+  value       = { for k, v in azurerm_spring_cloud_app.spring_cloud_apps : k => one(v.persistent_disk) if v.persistent_disk != null && length(v.persistent_disk) > 0 }
 }
 output "spring_cloud_apps_public_endpoint_enabled" {
   description = "Map of public_endpoint_enabled values across all spring_cloud_apps, keyed the same as var.spring_cloud_apps"
